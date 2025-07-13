@@ -1,53 +1,37 @@
-VPS Setup and Deployment Guide
+# VPS Setup & Deployment Guide
 
-This guide will walk you, step by step, through setting up a VPS, installing necessary software, deploying a Node/React app, and configuring CI/CD. No prior VPS experience is required.
+> A step-by-step walkthrough for absolute beginners—provisioning a Ubuntu VPS on Hostinger, installing Docker, Node.js, databases, PM2, Jenkins CI/CD, setting up Nginx proxy hosts & SSL, and troubleshooting.
 
-1. Introduction: What Is a VPS?
+---
 
-VPS (Virtual Private Server): A virtual machine you rent from a hosting provider. It acts like your own server with full root access.
+## Table of Contents
 
-You can install software, host websites, run databases, and more.
+1. [Provision Your VPS](#1-provision-your-vps)  
+2. [SSH & Basic Updates](#2-ssh--basic-updates)  
+3. [Install Docker](#3-install-docker)  
+4. [Install Nginx Proxy Manager (NPM)](#4-install-nginx-proxy-manager-npm)  
+5. [Install Node.js, npm, MySQL & MongoDB](#5-install-nodejs-npm-mysql--mongodb)  
+6. [Install PM2](#6-install-pm2)  
+7. [Create Project Folder & Transfer Files](#7-create-project-folder--transfer-files)  
+8. [Install & Configure Jenkins CI/CD](#8-install--configure-jenkins-cicd)  
+9. [Configure Proxy Hosts & SSL](#9-configure-proxy-hosts--ssl)  
+10. [Debugging Tips](#10-debugging-tips)  
 
-2. Provisioning Your VPS on Hostinger
+---
 
-Login to Hostinger: Navigate to your Hostinger dashboard.
+## 1. Provision Your VPS
 
-Create a New VPS:
+1. Log in to your Hostinger account.  
+2. Create a new **VPS** instance.  
+3. Choose **Ubuntu 22.04 LTS** (or latest LTS).  
+4. Set a **root** password you’ll remember.  
+5. Note your server’s **public IP** (appears in the dashboard).
 
-Choose a plan (e.g., 1 vCPU, 1 GB RAM).
+---
 
-Select Ubuntu 22.04 as the operating system.
+## 2. SSH & Basic Updates
 
-Set the Root Password: During setup, you’ll be prompted to create a root password. Save it securely.
+Open a terminal on your local machine and run:
 
-Find Your VPS IP Address: In the Hostinger dashboard, locate your VPS and note its public IP.
-
-3. Connecting to Your VPS via SSH
-
-Open a terminal (macOS/Linux) or PowerShell (Windows).
-
-Connect using SSH:
-
-ssh root@YOUR_VPS_IP
-
-Enter the password you set earlier.
-
-You are now logged in as root.
-
-4. Basic Server Maintenance
-
-Update package lists:
-
-apt update
-
-Upgrade installed packages:
-
-apt upgrade -y
-
-5. Installing Docker
-
-Install prerequisites:
-
-apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
-
-Add Docker’s GPG key and repository:
+```bash
+ssh root@YOUR_SERVER_IP
