@@ -1,44 +1,44 @@
-Below is the full README.md with every shell/YAML snippet wrapped in proper fenced code blocks. You can copy-paste this directly into your repo.
+VPS Setup & Deployment Guide
+A step-by-step walkthrough for absolute beginners—provisioning an Ubuntu VPS on Hostinger, installing Docker, Node.js, databases, PM2, Jenkins CI/CD, setting up Nginx proxy hosts & SSL, and troubleshooting.
 
-markdown
-Copy
-Edit
-# VPS Setup & Deployment Guide
+Table of Contents
+Provision Your VPS
 
-> A step-by-step walkthrough for absolute beginners—provisioning a Ubuntu VPS on Hostinger, installing Docker, Node.js, databases, PM2, Jenkins CI/CD, setting up Nginx proxy hosts & SSL, and troubleshooting.
+SSH & Basic Updates
 
----
+Install Docker
 
-## Table of Contents
+Install Nginx Proxy Manager (NPM)
 
-1. [Provision Your VPS](#1-provision-your-vps)  
-2. [SSH & Basic Updates](#2-ssh--basic-updates)  
-3. [Install Docker](#3-install-docker)  
-4. [Install Nginx Proxy Manager (NPM)](#4-install-nginx-proxy-manager-npm)  
-5. [Install Node.js, npm, MySQL & MongoDB](#5-install-nodejs-npm-mysql--mongodb)  
-6. [Install PM2](#6-install-pm2)  
-7. [Create Project Folder & Transfer Files](#7-create-project-folder--transfer-files)  
-8. [Install & Configure Jenkins CI/CD](#8-install--configure-jenkins-cicd)  
-9. [Configure Proxy Hosts & SSL](#9-configure-proxy-hosts--ssl)  
-10. [Debugging Tips](#10-debugging-tips)  
+Install Node.js, npm, MySQL & MongoDB
 
----
+Install PM2
 
-## 1. Provision Your VPS
+Create Project Folder & Transfer Files
 
-1. Log in to your Hostinger account.  
-2. Create a new **VPS** instance.  
-3. Choose **Ubuntu 22.04 LTS** (or latest LTS).  
-4. Set a **root** password you’ll remember.  
-5. Note your server’s **public IP** (appears in the dashboard).
+Install & Configure Jenkins CI/CD
 
----
+Configure Proxy Hosts & SSL
 
-## 2. SSH & Basic Updates
+Debugging Tips
 
+1. Provision Your VPS
+Log in to your Hostinger account.
+
+Create a new VPS instance.
+
+Choose Ubuntu 22.04 LTS (or latest LTS).
+
+Set a root password you’ll remember.
+
+Note your server’s public IP (appears in the dashboard).
+
+2. SSH & Basic Updates
 Open a terminal on your local machine and run:
 
-```bash
+bash
+Copy
+Edit
 ssh root@YOUR_SERVER_IP
 Enter the root password you set on Hostinger.
 
@@ -146,7 +146,7 @@ Copy
 Edit
 npm install -g pm2
 pm2 startup systemd
-This generates a pm2 startup command you must copy & paste back into your shell.
+Copy & paste the generated pm2 startup command back into your shell to complete the setup.
 
 7. Create Project Folder & Transfer Files
 7.1 On the server
@@ -205,7 +205,7 @@ Create New Item → Pipeline.
 
 Pipeline Script from SCM pointing to your GitHub repo.
 
-Add a Jenkinsfile in your repo (at project root):
+Add a Jenkinsfile at your repo root:
 
 groovy
 Copy
@@ -258,7 +258,7 @@ Forward Port: 3000
 
 Check Block Common Exploits
 
-Under SSL → Request a new SSL Certificate (Let's Encrypt)
+Under SSL → Request a new SSL Certificate (Let’s Encrypt)
 
 9.2 Manual Nginx (alternative)
 9.2.1 Create a site config
