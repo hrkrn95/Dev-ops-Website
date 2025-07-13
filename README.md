@@ -1,6 +1,6 @@
 # VPS Setup & Deployment Guide
 
-> A step-by-step walkthrough for absolute beginners—provisioning an Ubuntu VPS on Hostinger, installing Docker, Node.js, databases, PM2, Jenkins CI/CD, setting up Nginx proxy hosts & SSL, and troubleshooting.
+> A step-by-step walkthrough for absolute beginners—provisioning an Ubuntu VPS on Hostinger, installing Docker, Node.js, databases, PM2, Jenkins CI/CD, setting up Nginx proxy hosts & SSL, and debugging.
 
 ---
 
@@ -21,28 +21,42 @@
 
 ## 1. Provision Your VPS
 
-1. Log in to your Hostinger account.  
-2. Create a new **VPS** instance.  
-3. Choose **Ubuntu 22.04 LTS** (or latest LTS).  
-4. Set a **root** password you’ll remember.  
-5. Note your server’s **public IP** (appears in the dashboard).
+**What is a VPS?**  
+A Virtual Private Server (VPS) is a virtual machine rented from a hosting provider. It behaves like your own Linux server, but runs on shared hardware.
+
+**Why do we need it?**  
+We need a VPS to deploy our applications, run services, and make them accessible over the internet—independently of your personal computer.
+
+**How to provision on Hostinger:**  
+1. Log in to your Hostinger dashboard.  
+2. Click **VPS** → **Create VPS**.  
+3. Select **Ubuntu 22.04 LTS** (or the latest LTS).  
+4. Set a secure **root** password you’ll remember.  
+5. Save the **public IP** address shown—this is how you’ll connect via SSH.
 
 ---
 
 ## 2. SSH & Basic Updates
 
-Open a terminal on your local machine and run:
+**What is SSH?**  
+SSH (Secure Shell) lets you securely access your VPS’s command line over the internet.
+
+**Why update packages?**  
+`apt update` and `apt upgrade` fetch and install the latest security fixes and software updates.
+
+**How to connect & update:**
 
 ```bash
 ssh root@YOUR_SERVER_IP
 ```
 
-> Enter the **root** password you set on Hostinger.
-
-Once logged in, update packages:
+> Enter your root password when prompted.
 
 ```bash
+# Refresh package lists
 apt update -y
+
+# Upgrade all installed packages
 apt upgrade -y
 ```
 
@@ -50,13 +64,19 @@ apt upgrade -y
 
 ## 3. Install Docker
 
+**What is Docker?**  
+Docker is a containerization platform that packages apps and their dependencies into portable “containers.”
+
+**Why use Docker?**  
+Containers isolate your application, making deployments consistent across environments (development, staging, production).
+
 ### 3.1 Install prerequisites
 
 ```bash
 apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
 ```
 
-### 3.2 Add Docker’s GPG key & repo
+### 3.2 Add Docker’s GPG key & repository
 
 ```bash
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
@@ -85,7 +105,13 @@ systemctl enable docker
 
 ## 4. Install Nginx Proxy Manager (NPM)
 
-### 4.1 Create a directory
+**What is Nginx Proxy Manager?**  
+A Dockerized web interface that makes configuring Nginx proxy hosts, SSL, redirects, and more super easy.
+
+**Why use it?**  
+It gives you a friendly UI to manage domain routing and SSL certificates without writing Nginx configs by hand.
+
+### 4.1 Create a working directory
 
 ```bash
 mkdir ~/nginx-proxy-manager && cd ~/nginx-proxy-manager
@@ -100,9 +126,9 @@ services:
     image: jc21/nginx-proxy-manager:latest
     restart: always
     ports:
-      - "80:80"
-      - "81:81"
-      - "443:443"
+      - "80:80"    # HTTP
+      - "81:81"    # Admin UI
+      - "443:443"  # HTTPS
     volumes:
       - ./data:/data
       - ./letsencrypt:/etc/letsencrypt
@@ -123,6 +149,12 @@ docker-compose up -d
 
 ### 5.1 Node.js & npm
 
+**What is Node.js?**  
+A JavaScript runtime that allows you to run JS on the server.
+
+**Why install via Nodesource?**  
+Provides up-to-date Node releases for Ubuntu.
+
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
 apt install -y nodejs
@@ -137,12 +169,21 @@ npm -v
 
 ### 5.2 MySQL
 
+**What is MySQL?**  
+A relational database to store structured data.
+
+**Why secure installation?**  
+`mysql_secure_installation` guides you through removing defaults and setting strong passwords.
+
 ```bash
 apt install -y mysql-server
 mysql_secure_installation
 ```
 
 ### 5.3 MongoDB
+
+**What is MongoDB?**  
+A NoSQL document database—good for flexible, JSON-like data.
 
 ```bash
 wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | apt-key add -
@@ -160,16 +201,22 @@ systemctl enable mongod
 
 ## 6. Install PM2
 
+**What is PM2?**  
+A process manager for Node.js apps—keeps them alive, lets you restart on code changes, and manages logs.
+
 ```bash
 npm install -g pm2
 pm2 startup systemd
 ```
 
-> **Copy & paste** the generated `pm2 startup` command back into your shell to complete the setup.
+> **Important:** Copy the generated `pm2 startup …` command shown in your terminal and paste it back to complete setup.
 
 ---
 
 ## 7. Create Project Folder & Transfer Files
+
+**What are we doing?**  
+Creating a directory on the server for our app and moving local code up to it.
 
 ### 7.1 On the server
 
@@ -185,14 +232,14 @@ mkdir -p ~/projects/my-app
 scp -r ./my-app root@YOUR_SERVER_IP:~/projects/my-app
 ```
 
-#### b) Using FileZilla
+#### b) Using FileZilla  
+- **Host:** `YOUR_SERVER_IP`  
+- **Protocol:** SFTP  
+- **User:** `root`  
+- **Password:** *your root password*  
+- **Port:** `22`  
 
-- **Host**: `YOUR_SERVER_IP`  
-- **Protocol**: SFTP  
-- **User**: `root`  
-- **Password**: *your root password*  
-- **Port**: `22`  
-- Upload your local `my-app` folder into `~/projects/my-app`
+Upload your local `my-app` folder into `~/projects/my-app`.
 
 ### 7.3 Install dependencies on the server
 
@@ -205,10 +252,16 @@ npm install
 
 ## 8. Install & Configure Jenkins CI/CD
 
+**What is Jenkins?**  
+An automation server for building, testing, and deploying code.
+
+**Why use CI/CD?**  
+Automatically deploy your app on every Git push—no manual steps.
+
 ### 8.1 Install Jenkins
 
 ```bash
-wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add -
+wget -qO - https://pkg.jenkins.io/debian-stable/jenkins.io.key | apt-key add -
 echo "deb https://pkg.jenkins.io/debian-stable binary/" \
   | tee /etc/apt/sources.list.d/jenkins.list
 
@@ -218,70 +271,67 @@ systemctl start jenkins
 systemctl enable jenkins
 ```
 
-> Visit `http://YOUR_SERVER_IP:8080` and copy the initial admin password from:
+> After install, visit `http://YOUR_SERVER_IP:8080` and run:
 > ```bash
 > cat /var/lib/jenkins/secrets/initialAdminPassword
 > ```
 
 ### 8.2 Create a Pipeline Job
 
-1. **Install plugins**: Git, NodeJS, Docker, PM2.  
-2. **Create New Item → Pipeline**.  
-3. **Pipeline Script from SCM** pointing to your GitHub repo.  
-4. Add a `Jenkinsfile` at your repo root:
+1. Install plugins: **Git**, **NodeJS**, **Docker**, **PM2**.  
+2. New Item → **Pipeline**.  
+3. Select **Pipeline script from SCM** → GitHub repo URL.  
+4. Add this `Jenkinsfile` at your repo root:
 
-```groovy
-pipeline {
-  agent any
-  environment {
-    APP_DIR = "/root/projects/my-app"
-  }
-  stages {
-    stage('Checkout') {
-      steps {
-        git branch: 'main', url: 'https://github.com/YourUser/YourRepo.git'
+    ```groovy
+    pipeline {
+      agent any
+      environment {
+        APP_DIR = "/root/projects/my-app"
+      }
+      stages {
+        stage('Checkout') {
+          steps {
+            git branch: 'main', url: 'https://github.com/YourUser/YourRepo.git'
+          }
+        }
+        stage('Install') {
+          steps { sh 'cd $APP_DIR && npm install' }
+        }
+        stage('Build') {
+          steps { sh 'cd $APP_DIR && npm run build' }
+        }
+        stage('Deploy') {
+          steps {
+            sh """
+              pm2 stop my-app || true
+              pm2 start npm --name "my-app" -- start
+              pm2 save
+            """
+          }
+        }
       }
     }
-    stage('Install') {
-      steps {
-        sh 'cd $APP_DIR && npm install'
-      }
-    }
-    stage('Build') {
-      steps {
-        sh 'cd $APP_DIR && npm run build'
-      }
-    }
-    stage('Deploy') {
-      steps {
-        sh """
-          pm2 stop my-app || true
-          pm2 start npm --name "my-app" -- start
-          pm2 save
-        """
-      }
-    }
-  }
-}
-```
+    ```
 
-5. **Save** and **Build Now**—your code will deploy automatically on each push.
+5. Save & **Build Now**. Your app auto-deploys on each push!
 
 ---
 
 ## 9. Configure Proxy Hosts & SSL
 
+**What is a proxy host?**  
+It routes incoming domain traffic (e.g. `example.com`) to your app on a specific port.
+
 ### 9.1 Via Nginx Proxy Manager UI
 
-- **Proxy Hosts → Add Proxy Host**  
-  - Domain Names: `example.com`, `www.example.com`  
-  - Scheme: `http`  
-  - Forward Hostname/IP: `127.0.0.1`  
-  - Forward Port: `3000`  
-  - Check **Block Common Exploits**  
-  - Under SSL → **Request a new SSL Certificate** (Let’s Encrypt)
+1. **Proxy Hosts → Add Proxy Host**  
+2. Domain Names: `example.com`, `www.example.com`  
+3. Scheme: `http` → Forward to `127.0.0.1:3000`  
+4. Enable **Block Common Exploits**  
+5. Under **SSL**, request a new Let’s Encrypt certificate  
 
-### 9.2 Manual Nginx (alternative)
+### 9.2 Manual Nginx Configuration
 
 #### 9.2.1 Create a site config
 
@@ -325,21 +375,25 @@ certbot --nginx -d example.com -d www.example.com
 
 ## 10. Debugging Tips
 
-- **Docker logs**  
+**Why debug?**  
+Deployments can fail—logs and checks help you pinpoint issues.
+
+- **Docker logs:**  
   ```bash
   docker-compose logs -f
   ```
-- **PM2 logs**  
+- **PM2 logs:**  
   ```bash
   pm2 logs my-app
   ```
-- **Jenkins console** → click the build **Console Output**.  
-- **Nginx syntax**  
+- **Jenkins console:**  
+  In Jenkins → *your job* → *Console Output*  
+- **Nginx syntax & errors:**  
   ```bash
   nginx -t
   tail -f /var/log/nginx/error.log
   ```
-- **System health**  
+- **System health:**  
   ```bash
   htop
   df -h
@@ -347,4 +401,4 @@ certbot --nginx -d example.com -d www.example.com
 
 ---
 
-*That’s it!* Your students can now follow **every** step in order, copy any shell snippet with one click, and have a production-ready Node.js app running behind Docker, Jenkins, and Nginx with SSL.
+*Congratulations!*  
