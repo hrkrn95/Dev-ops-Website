@@ -92,7 +92,7 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docke
 
 ```bash
 apt update
-apt install -y docker-ce docker-ce-cli containerd.io
+sudo apt install docker-compose-plugin -y
 ```
 
 ### 3.4 Start & enable Docker
@@ -119,6 +119,11 @@ mkdir ~/nginx-proxy-manager && cd ~/nginx-proxy-manager
 ```
 
 ### 4.2 Create a `docker-compose.yml`
+```bash
+sudo nano docker-compose.yml
+```
+Then paste the below code in it and press CTRL + O and then Enter and Then CTRL + C
+
 
 ```yaml
 version: '3'
