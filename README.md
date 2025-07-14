@@ -59,8 +59,9 @@ apt update -y
 # Upgrade all installed packages
 apt upgrade -y
 ```
-if you are enable to connect check if firewal is enabled with ufw enable and then ufw allow ssh this will allow ssh through firewall
 ---
+if you are enable to connect check if firewal is enabled with ufw enable and then ufw allow ssh this will allow ssh through firewall
+
 
 ## 3. Install Docker
 
